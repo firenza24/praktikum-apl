@@ -25,7 +25,7 @@ struct Warga {
     DetailAlamat alamat;
 };
 
-void bubbleSortNama(Warga *daftar, int n) {
+void bubbleSortNama(Warga daftar[], int n) {
     for (int i = 0; i < n - 1; i++) {
         for (int j = 0; j < n - i - 1; j++) {
             if (daftar[j].nama > daftar[j + 1].nama) {
@@ -37,7 +37,7 @@ void bubbleSortNama(Warga *daftar, int n) {
     }
 }
 
-void selectionSortNIK(Warga *daftar, int n) {
+void selectionSortNIK(Warga daftar[], int n) {
     for (int i = 0; i < n - 1; i++) {
         int max_idx = i;
         for (int j = i + 1; j < n; j++) {
@@ -51,7 +51,7 @@ void selectionSortNIK(Warga *daftar, int n) {
     }
 }
 
-void insertionSortNamaDesc(Warga *daftar, int n) {
+void insertionSortNamaDesc(Warga daftar[], int n) {
     for (int i = 1; i < n; i++) {
         Warga key = daftar[i];
         int j = i - 1;
@@ -93,23 +93,25 @@ void tampilkanMenu(string role) {
     cout << "Pilih Menu: ";
 }
 
-void tambahWarga(Warga *daftar, int *jumlah) {
+void tambahWarga(Warga daftar[], int *jumlah) {
     if (*jumlah < 5) {
-        Warga *baru = &daftar[*jumlah];
+        Warga *baru = &daftar[*jumlah]; 
+        
         cout << KUNING << "\n>>> Input Data Warga <<<" << RESET << endl;
         cout << "Nama     : "; getline(cin, baru->nama);
         cout << "NIK      : "; getline(cin, baru->nik);
         cout << "Jalan    : "; getline(cin, baru->alamat.jalan);
         cout << "No jalan : "; getline(cin, baru->alamat.nomor_jalan);
         baru->status = "Aktif";
-        (*jumlah)++;
+        
+        (*jumlah)++; 
         konfirmasi("Penambahan Data");
     } else {
         cout << MERAH << "[!] Kapasitas penuh!" << RESET << endl;
     }
 }
 
-void lihatWarga(Warga *daftar, int jumlah, string role) {
+void lihatWarga(Warga daftar[], int jumlah, string role) {
     if (jumlah == 0) {
         cout << MERAH << "\n[!] Belum ada warganya." << RESET << endl;
         return;
@@ -127,11 +129,9 @@ void lihatWarga(Warga *daftar, int jumlah, string role) {
         if (pilSort == 1) bubbleSortNama(daftar, jumlah);
         else if (pilSort == 2) selectionSortNIK(daftar, jumlah);
         else if (pilSort == 3) insertionSortNamaDesc(daftar, jumlah);
-        else if (pilSort != 4) cout << MERAH << "[!] Pilihan sorting tidak tersedia." << RESET << endl;
     }
 
     cout << "\nTotal Data: " << KUNING << hitungTotalWarga(jumlah) << RESET << endl; 
-    
     cout << ABU << setfill('=') << setw(80) << "=" << RESET << endl;
     cout << setfill(' '); 
     
@@ -145,16 +145,15 @@ void lihatWarga(Warga *daftar, int jumlah, string role) {
     cout << setfill(' ');
 
     for (int i = 0; i < jumlah; i++) {
-        Warga *p = (daftar + i);
-        string warnaStatus = (p->status == "Aktif") ? HIJAU : MERAH;
+        Warga &p = daftar[i];
+        string warnaStatus = (p.status == "Aktif") ? HIJAU : MERAH;
         
         cout << left << setw(5) << i + 1 
-             << setw(20) << p->nama 
-             << setw(15) << p->nik 
-             << warnaStatus << setw(15) << p->status << RESET 
-             << p->alamat.jalan << " No." << p->alamat.nomor_jalan << endl;
+             << setw(20) << p.nama 
+             << setw(15) << p.nik 
+             << warnaStatus << setw(15) << p.status << RESET 
+             << p.alamat.jalan << " No." << p.alamat.nomor_jalan << endl;
     }
-    
     cout << ABU << setfill('=') << setw(80) << "=" << RESET << endl;
     cout << setfill(' ');
 }
@@ -163,7 +162,7 @@ int main() {
     string admin_user = "Rega", admin_pw = "085";
     string member_user = "Warga", member_pw = "999";
     
-    Warga daftar_warga[5];
+    Warga daftar_warga[3]; 
     int jumlah_warga = 0;
     bool program_jalan = true;
 
@@ -205,23 +204,23 @@ int main() {
 
             if (role_aktif == "admin") {
                 if (pilihan == 1) {
-                    tambahWarga(daftar_warga, &jumlah_warga);
+                    tambahWarga(daftar_warga, &jumlah_warga); 
                 } else if (pilihan == 2) {
                     lihatWarga(daftar_warga, jumlah_warga, role_aktif);
                 } else if (pilihan == 3) {
                     int idx;
                     cout << "Masukkan Nomor Urut: "; cin >> idx; cin.ignore();
                     if (idx > 0 && idx <= jumlah_warga) {
-                        Warga *p = &daftar_warga[idx-1];
-                        cout << KUNING << "\n>>> Edit Data: " << p->nama << " <<<" << RESET << endl;
+                        Warga &p = daftar_warga[idx-1];
+                        cout << KUNING << "\n>>> Edit Data: " << p.nama << " <<<" << RESET << endl;
                         cout << "1. Nama\n2. NIK\n3. Status\n4. Alamat\nPilih: ";
                         int subPilihan; cin >> subPilihan; cin.ignore();
-                        if (subPilihan == 1) { cout << "Nama Baru: "; getline(cin, p->nama); }
-                        else if (subPilihan == 2) { cout << "NIK Baru: "; getline(cin, p->nik); }
-                        else if (subPilihan == 3) { cout << "Status Baru: "; getline(cin, p->status); }
+                        if (subPilihan == 1) { cout << "Nama Baru: "; getline(cin, p.nama); }
+                        else if (subPilihan == 2) { cout << "NIK Baru: "; getline(cin, p.nik); }
+                        else if (subPilihan == 3) { cout << "Status Baru: "; getline(cin, p.status); }
                         else if (subPilihan == 4) { 
-                            cout << "Jalan Baru: "; getline(cin, p->alamat.jalan);
-                            cout << "No Baru   : "; getline(cin, p->alamat.nomor_jalan);
+                            cout << "Jalan Baru: "; getline(cin, p.alamat.jalan);
+                            cout << "No Baru   : "; getline(cin, p.alamat.nomor_jalan);
                         }
                         konfirmasi("Update Data");
                     } else {
@@ -244,8 +243,6 @@ int main() {
                     cout << HIJAU << "\n[✔] Logout berhasil!" << RESET << endl;
                 } else if (pilihan == 6) {
                     program_jalan = false; login_aktif = false;
-                } else {
-                    cout << MERAH << "[!] Menu tidak tersedia!" << RESET << endl;
                 }
             } else {
                 if (pilihan == 1) {
@@ -255,8 +252,6 @@ int main() {
                     cout << HIJAU << "\nLogout berhasil!" << RESET << endl;
                 } else if (pilihan == 6) {
                     program_jalan = false; login_aktif = false;
-                } else {
-                    cout << MERAH << "[!] Menu tidak tersedia!" << RESET << endl;
                 }
             }
         }
